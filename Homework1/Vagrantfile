@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+    config.vm.network "private_network", ip: "172.30.1.5"
+    config.vm.provider :virtualbox
+  
+    config.vm.provision "shell", inline: $SYSTEM_PREP
+end
+
+$SYSTEM_PREP = <<~'SCRIPT'
+      apt-get update
+      
+      mkdir -p /home/vagrant/.vnc /opt/jre
+
+      wget -qO jre-8u271-linux-x64.tar.gz "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=243727_61ae65e088624f5aaa0b1d2d801acb16"
+      tar -zxf jre-8u271-linux-x64.tar.gz -C /opt/jre
+      rm jre-8u271-linux-x64.tar.gz
+      update-alternatives --install /usr/bin/java java /opt/jre/jre1.8.0_271/bin/java 100
+
+      apt install -y firefox
+      
+      DEBIAN_FRONTEND=noninteractive apt install -y xfce4 xfce4-goodies tightvncserver novnc websockify python3-numpy build-essential net-tools
+
+      cat > /home/vagrant/.vnc/xstartup << EOF
+      !/bin/bash
+      xrdb $HOME/.Xresources
+      startxfce4 &
+      EOF
+
+      chmod +x /home/vagrant/.vnc/xstartup
+      echo strongpasswd | vncpasswd -f > /home/vagrant/.vnc/passwd
+      chmod 600 /home/vagrant/.vnc/passwd
+      touch /home/vagrant/.Xauthority
+      chown -R vagrant:vagrant /home/vagrant
+      sudo -u vagrant vncserver
+      websockify -D --web=/usr/share/novnc/ 6080 localhost:5901
+SCRIPT
