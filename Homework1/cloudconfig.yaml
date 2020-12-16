@@ -1,0 +1,40 @@
+#cloud-config
+
+users:
+  - name: msi
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+write_files:
+  - path: /home/msi/.vnc/xstartup
+    owner: msi:msi
+    content: |
+      #!/bin/sh
+      xrdb $HOME/.Xresources
+      startxfce4 &
+    permissions: 0755
+
+packages:
+  - tightvncserver
+  - xfce4
+  - xfce4-goodies
+  - novnc
+  - websockify
+  - python-numpy
+  - firefox
+  - build-essential
+  - net-tools
+
+runcmd:
+  - mkdir -p /home/msi/.vnc /opt/jre
+  - wget -qO jre-8u271-linux-x64.tar.gz "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=243727_61ae65e088624f5aaa0b1d2d801acb16"
+  - tar -zxf jre-8u271-linux-x64.tar.gz -C /opt/jre
+  - rm jre-8u271-linux-x64.tar.gz
+  - update-alternatives --install /usr/bin/java java /opt/jre/jre1.8.0_271/bin/java 100
+  - echo strongpasswd | vncpasswd -f > /home/msi/.vnc/passwd
+  - chmod 600 /home/msi/.vnc/passwd
+  - touch /home/msi/.Xauthority
+  - chown -R msi:msi /home/msi
+  - sudo -u msi vncserver
+  - websockify -D --web=/usr/share/novnc/ 6080 localhost:5901
