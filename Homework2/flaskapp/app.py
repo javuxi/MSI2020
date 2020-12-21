@@ -11,3 +11,6 @@ def process():
   input2 = float(request.form['input2'])
   output = str(input1 + input2)
   return jsonify({"output":"Result: " + output})
+
+if __name__ == '__main__':
+  app.run(host='0.0.0.0', port=8000)
