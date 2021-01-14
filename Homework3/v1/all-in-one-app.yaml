@@ -30,5 +30,5 @@ spec:
         - name: flaskapp
           image: flaskapp:1.0.0
           ports:
-            - containerPort: 5000
+            - containerPort: 8000
           imagePullPolicy: Always
