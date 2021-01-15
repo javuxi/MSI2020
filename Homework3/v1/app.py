@@ -4,7 +4,7 @@ import json
 from pymongo import MongoClient
 from bson.json_util import dumps
 
-r = redis.Redis(host='cache', port=6379, db=0)
+r = redis.Redis(host='my-redis-svc.default.svc.cluster.local', port=6379, db=0)
 
 app = Flask("Calc")
 
