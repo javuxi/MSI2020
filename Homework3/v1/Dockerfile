@@ -12,4 +12,4 @@ COPY --from=base /usr/local/lib/python3.8 /usr/local/lib/python3.8
 COPY --from=base /usr/local/bin/gunicorn /usr/local/bin/gunicorn
 WORKDIR /code
 
-CMD ["gunicorn -b 0.0.0.0:8000 app:app"]
+CMD ["python", "app.py"]
